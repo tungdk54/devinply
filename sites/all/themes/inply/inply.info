@@ -25,10 +25,10 @@ regions[page_bottom]    = 'Page bottom'
 ;;;;;;;;;;;;;;;;;;;;;
 
 stylesheets[all][] = css/style.css
-scripts[] = 'js/script.js'
-scripts[] = 'js/jquery.mCustomScrollbar.concat.min.js'
-scripts[] = 'js/jquery.mousewheel.js'
-stylesheets[all][] = 'js/jquery.mCustomScrollbar.css'
+scripts[] = js/script.js
+scripts[] = js/jquery.mCustomScrollbar.concat.min.js
+scripts[] = js/jquery.mousewheel.js
+stylesheets[all][] = js/jquery.mCustomScrollbar.css
 
 
 ; For information on choosing the desired method, please read the Drupal

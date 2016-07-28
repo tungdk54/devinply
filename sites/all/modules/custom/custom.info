@@ -1,0 +1,7 @@
+name = Inply custom
+description = Inply custom 
+core = 7.x
+
+version = "7.x-0.0"
+core = "7.x"
+project = "custom"

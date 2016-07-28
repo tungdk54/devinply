@@ -74,7 +74,8 @@
  */
 ?>
 <?php
-  $page_one_column = array('quan-ly-can-ho', 'quan-tri-noi-dung', 'quan-ly-phuong-tien', 'quan-ly-can-ho-chu-so-huu');
+  $page_one_column = array('quan-ly-can-ho', 'quan-tri-noi-dung', 'quan-ly-phuong-tien',
+    'quan-ly-thu-phi-trong-giu-phuong-tien', 'quan-ly-thu-phi-ve-sinh', 'quan-ly-thu-phi-dich-vu', 'quan-ly-toa-nha');
 ?>
 
 <header id="navbar" role="banner" class="navbar container-fluid navbar-default">

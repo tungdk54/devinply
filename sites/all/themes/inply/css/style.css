@@ -1323,6 +1323,21 @@ body ul.pager li.pager-current a {
     font-weight: bold;
     text-transform: uppercase;
 }
+.admin-view-manage table td {
+    border: 1px solid #ddd;
+}
+.admin-view-manage table.views-table td table th {
+    background: #f5f5f5;
+    font-size: 11px;
+    padding: 2px 3px;
+    text-align: center;
+}
+.admin-view-manage table table {
+    width: 100%;
+}
+.admin-view-manage table table td {
+    padding: 2px 3px;
+}
 
 body #admin-menu,
 body #admin-menu .dropdown,
@@ -1330,4 +1345,86 @@ div#admin-menu,
 div#admin-menu .dropdown {
     font-size: 12px !important;
     line-height: 2.4em !important;
+}
+
+.page-quan-ly-phuong-tien .main-container, .page-quan-ly-thu-phi-trong-giu-phuong-tien .main-container,
+.page-quan-ly-can-ho .main-container,
+.page-quan-ly-thu-phi-ve-sinh .main-container, .page-quan-ly-thu-phi-dich-vu .main-container,
+.page-quan-ly-toa-nha .main-container {
+    width: 100%;
+}
+.space-tab {
+    width: 50px;
+    display: inline-block;
+}
+
+@media print {
+  body * {
+    visibility:hidden;
+  }
+  .printPage * {
+    visibility:visible;
+  }
+  #printSection {
+    position:absolute;
+    left:0;
+    top:0;
+  }
+}
+
+.center h4,
+.center p {
+    text-align: center;
+}
+.tieude {
+    margin-bottom: 20px;
+}
+.tieude h4 {
+    margin-top: 10px;
+    font-size: 18px;
+    color: #000;
+}
+.chuky {
+    display: inline-block;
+    width: 100%;
+}
+.chuky>div {
+    float: right;
+    text-align: center;
+}
+.chuky>div i {
+    margin-bottom: 35px;
+    display: inline-block;
+}
+.modal {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 16px;
+}
+#hoadonThanhToan .hoadonWrapper {
+    width: 794px;
+    height: 560px;
+    padding: 30px;
+    border: 1px solid #ddd;
+}
+#hoadonThanhToan .modal-body {
+    padding: 20px 20px 0;
+}
+#hoadonThanhToan .modal-footer {
+    margin-top: 0;
+    border: none;
+}
+#hoadonThanhToan .modal-header {
+    border: none;
+}
+@media screen and (min-width: 768px) {
+    .page-quan-ly-toa-nha .modal-dialog {
+        width: 560px;
+        max-height: 854px;
+    }
+    .page-quan-ly-toa-nha .modal-body {
+        padding: 10px 20px;
+    }
+    .page-quan-ly-toa-nha .modal-footer {
+        margin-top: 0;
+    }
 }
