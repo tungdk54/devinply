@@ -1,0 +1,5 @@
+name = Manager Fees
+description = Manager Fees of Flats
+package = Customs
+core = 7.x
+

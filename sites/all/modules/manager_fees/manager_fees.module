@@ -1,0 +1,299 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function manager_fees_menu() {
+
+  $path = drupal_get_path('module', 'manager_fees') . '/includes';
+
+  $items['quan-ly-can-ho/thu-phi'] = array(
+    'title' => 'Thu phí',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('manager_fees_form'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'manager_fees.admin.inc',
+    'file path' => $path
+  );
+
+  $items['quan-ly-can-ho/thu-phi-dich-vu'] = array(
+    'title' => 'Thu phí dich vu',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('manager_service_fees_form'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'manager_service_fees.admin.inc',
+    'file path' => $path
+  );
+
+  $items['quan-ly-can-ho/thu-phi-ve-sinh'] = array(
+    'title' => 'Thu phí vệ sinh',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('manager_cleaning_fees_form'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'manager_cleaning_fees.admin.inc',
+    'file path' => $path
+  );
+
+
+  $items['get-flast'] = array(
+    'page callback' => 'ajax_get_flast',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'manager_fees.admin.inc',
+    'file path' => $path
+  );
+
+  return $items;
+}
+function manager_fees_preprocess_page(&$vars) {
+  $test = _get_vehicles(165);
+}
+
+/**
+ * Get all vehicle of flast
+ */
+
+function _get_vehicles($flats) {
+  $node = node_load($flats);
+  $vehicles = field_get_items('node', $node, 'field_vehicles_use');
+  $nids = array();
+  $type = array(
+    '47' => 'bike_fees',
+    '46' => 'motorbike_1',
+    '65' => 'motorbike_1',
+    '66' => 'motorbike_2',
+    '45' => 'oto_fees_1',
+    '63' => 'oto_fees_1',
+    '64' => 'oto_fees_2',
+    '48' => 'electric_bikes_fees'
+  );
+  foreach ($vehicles as $key => $vehicle) {
+    $vehicle = node_load($vehicle['nid']);
+    $nids[$vehicle->nid] = $type[$vehicle->field_loai_phuong_tien['und'][0]['tid']];
+  }
+
+  return $nids;
+}
+
+function _get_table_fees_price($month, $year) {
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'node')
+  ->entityCondition('bundle', 'table_price')
+  ->propertyCondition('status', NODE_PUBLISHED)
+  ->fieldCondition('field_month', 'tid', $month, '=')
+  ->fieldCondition('field_year', 'tid', $year, '=');
+  $result = $query->execute();
+
+  if (isset($result['node'])) {
+    $nid = array_keys($result['node']);
+    $node = node_load($nid[0]);
+
+    $table_price = array();
+    $table_price['clean_fees_1'] = $node->field_clean_fees_1['und'][0]['value'];
+    $table_price['clean_fees_2'] = $node->field_clean_fees_2['und'][0]['value'];
+    $table_price['service_fees_1'] = $node->field_service_fees_1['und'][0]['value'];
+    $table_price['service_fees_2'] = $node->field_service_fees_2['und'][0]['value'];
+    $table_price['motorbike_1'] = $node->field_motorbike_1['und'][0]['value'];
+    $table_price['motorbike_2'] = $node->field_motorbike_2['und'][0]['value'];
+    $table_price['oto_fees_1'] = $node->field_oto_fees_1['und'][0]['value'];
+    $table_price['oto_fees_2'] = $node->field_oto_fees_2['und'][0]['value'];
+    $table_price['bike_fees'] = $node->field_bike_fees['und'][0]['value'];
+    $table_price['electric_bikes_fees'] = $node->field_electric_bikes_fees['und'][0]['value'];
+    return $table_price;
+  }
+}
+
+
+function _get_fees_month() {
+
+}
+
+
+function _calculate_fees_vehicles($nids, $month, $year) {
+
+}
+
+function _calculate_fees_service($flats) {
+
+}
+
+
+function _calcutlate_fees_clean($flats) {
+
+}
+
+/**
+ * Kiem tra ton tai node cac loai phi
+ */
+function _check_node_fees_exit($flats, $month, $year, $bundle) {
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'node')
+  ->entityCondition('bundle', $bundle)
+  ->propertyCondition('status', NODE_PUBLISHED)
+  ->fieldCondition('field_can_ho', 'nid', $flats, '=')
+  ->fieldCondition('field_month', 'tid', $month, '=')
+  ->fieldCondition('field_year', 'tid', $year, '=');
+  $result = $query->execute();
+
+  if (isset($result['node'])) {
+    $nid = array_keys($result['node'])[0];
+    return $nid;
+  }
+
+  return 0;
+}
+
+
+function _create_node_fees($flats_name, $flats, $month, $year) {
+  global $user;
+  $term_month = taxonomy_term_load($month);
+  $month_name = $term_month->name;
+  $term_year = taxonomy_term_load($year);
+  $year_name = $term_year->name;
+  $title = "Thu phí căn hộ - {$flats_name} - {$month_name} - {$year_name}";
+  $values = array(
+    'type' => 'fees',
+    'uid' => $user->uid,
+    'status' => 1,
+    'comment' => 0,
+    'promote' => 0,
+  );
+  $entity = entity_create('node', $values);
+  $wrapper = entity_metadata_wrapper('node', $entity);
+  $wrapper->title->set($title);
+  $wrapper->field_can_ho->set($flats);
+  $wrapper->field_month->set($month);
+  $wrapper->field_year->set($year);
+  $wrapper->save();
+  return $wrapper->getIdentifier();
+}
+
+function _update_node_fees($nid, $data, $total) {
+  $node = node_load($nid);
+  $wrapper = entity_metadata_wrapper('node', $node);
+  $vehicles = array_keys($data['vehicles']);
+  $wrapper->field_vehicles_use->set($vehicles);
+  $wrapper->field_fees_status->set(1);
+  $wrapper->field_fees_service->set($data['fees_service']);
+  $wrapper->field_fees_vehicles->set($data['fees_vehicles']);
+  $wrapper->field_fees_clean->set($data['fees_clean']);
+  if (isset($data['fees_total'])) {
+    $total = 0;
+  }
+  $wrapper->field_so_tien_nop->set($total);
+  $date = new DateTime();
+  $node->field_start_date[LANGUAGE_NONE][0] = array(
+   'value' => date_format($date, 'Y-m-d'),
+   'timezone' => 'UTC',
+   'timezone_db' => 'UTC',
+  );
+  $wrapper->save();
+  drupal_set_message($node->title(),'status');
+}
+
+function _convert_taxonomy_to_time($month, $year) {
+  $terms_month = taxonomy_get_tree(13);
+  foreach ($terms_month as $key => $term) {
+    $options_month[$term->tid] = $key + 1;
+  }
+
+  $terms_year = taxonomy_get_tree(14);
+  foreach ($terms_year as $key => $term) {
+    $options_year[$term->tid] = $term->name;;
+  }
+
+  return $options_month[$month] . '-' . $options_year[$year];
+}
+
+// Create the service node
+function _create_node_service_fees($title, $flats, $month, $year) {
+  global $user;
+  $flat_node = node_load($flats);
+  $flats_name = $flat_node->title;
+
+  $term_month = taxonomy_term_load($month);
+  $month_name = $term_month->name;
+  $term_year = taxonomy_term_load($year);
+  $year_name = $term_year->name;
+  $title = "Thu phí dich vu căn hộ - {$flats_name} - {$month_name} - {$year_name}";
+  $values = array(
+    'type' => 'service_fees',
+    'uid' => $user->uid,
+    'status' => 1,
+    'comment' => 0,
+    'promote' => 0,
+  );
+  $entity = entity_create('node', $values);
+  $wrapper = entity_metadata_wrapper('node', $entity);
+  $wrapper->title->set($title);
+  $wrapper->field_can_ho->set($flats);
+  $wrapper->field_month->set($month);
+  $wrapper->field_year->set($year);
+  $wrapper->save();
+  return $wrapper->getIdentifier();
+}
+
+// Update the service node
+function _update_node_service_fees($nid, $total) {
+  $node = node_load($nid);
+  $wrapper = entity_metadata_wrapper('node', $node);
+  $wrapper->field_fees_status->set(1);
+  $wrapper->field_so_tien_nop->set($total);
+  $date = new DateTime();
+  $node->field_start_date[LANGUAGE_NONE][0] = array(
+   'value' => date_format($date, 'Y-m-d'),
+   'timezone' => 'UTC',
+   'timezone_db' => 'UTC',
+  );
+  $wrapper->save();
+  drupal_set_message($node->title,'status');
+}
+
+// Create the cleaning node
+function _create_node_cleaning_fees($title, $flats, $month, $year) {
+  global $user;
+  $flat_node = node_load($flats);
+  $flats_name = $flat_node->title;
+
+  $term_month = taxonomy_term_load($month);
+  $month_name = $term_month->name;
+  $term_year = taxonomy_term_load($year);
+  $year_name = $term_year->name;
+  $title = "Thu phí vệ sinh căn hộ - {$flats_name} - {$month_name} - {$year_name}";
+  $values = array(
+    'type' => 'cleaning_fees',
+    'uid' => $user->uid,
+    'status' => 1,
+    'comment' => 0,
+    'promote' => 0,
+  );
+  $entity = entity_create('node', $values);
+  $wrapper = entity_metadata_wrapper('node', $entity);
+  $wrapper->title->set($title);
+  $wrapper->field_can_ho->set($flats);
+  $wrapper->field_month->set($month);
+  $wrapper->field_year->set($year);
+  $wrapper->save();
+  return $wrapper->getIdentifier();
+}
+
+// Update the cleaning node
+function _update_node_cleaning_fees($nid, $total) {
+  $node = node_load($nid);
+  $wrapper = entity_metadata_wrapper('node', $node);
+  $wrapper->field_fees_status->set(1);
+  $wrapper->field_so_tien_nop->set($total);
+  $date = new DateTime();
+  $node->field_start_date[LANGUAGE_NONE][0] = array(
+   'value' => date_format($date, 'Y-m-d'),
+   'timezone' => 'UTC',
+   'timezone_db' => 'UTC',
+  );
+  $wrapper->save();
+  drupal_set_message($node->title,'status');
+}
